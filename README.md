@@ -49,7 +49,7 @@ Files in [`docker-evidence`](docker-evidence):
 
 **3. Changing the file didn't change the page.** `COPY` runs once, at build time, so the container served the old snapshot. I had to rebuild the image and start a new container.
 
-**4. Two clocks disagreed after the reboot test.** `uptime -s` said the VM booted three minutes *after* the container's start time. I used `journalctl -o short-monotonic`, which counts seconds since boot and doesn't depend on the wall clock, and it showed that Docker started at 6.5 seconds. I suspect a clock adjustment after boot, but I haven't proved that.
+**4. Two timestamps didn't match.** After the reboot test, the VM's boot time came out *later* than the container's start time, which can't be right. Docker's boot log counts seconds since power-on instead of using the clock, and it showed Docker starting 6.5 seconds after boot. I believe the VM's clock was adjusted after startup, but I didn't confirm that, so I used the boot log as my evidence.
 
 ## Limitations and next steps
 
