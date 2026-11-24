@@ -1,0 +1,4 @@
+[    6.527779] Ubuntuserver systemd[1]: Starting docker.service - Docker Application Container Engine...
+[    6.799219] Ubuntuserver dockerd[1203]: time="2026-11-24T09:28:54.818027692Z" level=info msg="Starting up"
+[    6.805292] Ubuntuserver dockerd[1203]: time="2026-11-24T09:28:54.824108028Z" level=info msg="OTEL tracing is not configured, using no-op tracer provider"
+container started at: 2026-11-24T09:28:55.355905446Z
