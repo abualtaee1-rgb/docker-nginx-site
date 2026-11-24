@@ -1,0 +1,57 @@
+# Docker nginx Site
+
+A small static web page served by nginx in a Docker container, built from my own Dockerfile. It runs on my hardened Ubuntu Server VM from [linux-homelab](https://github.com/abualtaee1-rgb/linux-homelab). This is the third project in my DevOps portfolio.
+
+Tested on Ubuntu Server 26.04 LTS (VirtualBox VM) with Docker 29.1.3 (Ubuntu's `docker.io` package).
+
+## What it does
+
+- The `Dockerfile` starts from the official `nginx` image and copies `index.html` into the folder nginx serves pages from.
+- The container publishes its port only on the VM's own loopback address (`127.0.0.1`), so nothing else on the network can reach it.
+- A restart policy (`unless-stopped`) starts the container again automatically after a reboot.
+
+## Dockerfile
+
+```
+FROM nginx
+COPY index.html /usr/share/nginx/html/
+```
+
+## How to run it
+
+```bash
+sudo docker build -t my-web .
+sudo docker run -d -p 127.0.0.1:8080:80 --name web my-web
+curl http://127.0.0.1:8080
+sudo docker update --restart unless-stopped web
+```
+
+## Decisions
+
+- **`sudo docker`, not the `docker` group.** Membership in that group is effectively root access on the host, which doesn't fit a server I'm trying to harden.
+- **Port bound to `127.0.0.1`.** Docker publishes ports on all interfaces by default, and I only wanted local access.
+- **`unless-stopped`, not `always`.** If I stop the container on purpose, it stays stopped after a reboot.
+
+## Evidence
+
+Files in [`docker-evidence`](docker-evidence):
+
+- `docker-ps-evidence.txt`: the running container and its port mapping
+- `docker-webpage-evidence.txt`: the page returned by `curl`
+- `docker-uptime-evidence.txt`: VM uptime after the reboot test
+- `docker-boot-evidence.txt`: Docker starting about 6.5 seconds after boot, and the container starting right after it
+
+## What broke and how I fixed it
+
+**1. The Dockerfile mixed up two sets of paths.** `COPY` takes a path on my machine (relative to the build folder) and a path *inside the image*. I wrote laptop-style paths for both. The fix was `index.html` as the source and `/usr/share/nginx/html/` as the destination.
+
+**2. `docker build` needs a build context.** I left off the final `.`, and Docker answered "requires 1 argument". The dot tells Docker which folder to send to the daemon.
+
+**3. Changing the file didn't change the page.** `COPY` runs once, at build time, so the container served the old snapshot. I had to rebuild the image and start a new container.
+
+**4. Two clocks disagreed after the reboot test.** `uptime -s` said the VM booted three minutes *after* the container's start time. I used `journalctl -o short-monotonic`, which counts seconds since boot and doesn't depend on the wall clock, and it showed that Docker started at 6.5 seconds. I suspect a clock adjustment after boot, but I haven't proved that.
+
+## Limitations and next steps
+
+- I haven't tested how Docker's published ports interact with UFW. Docker writes its own firewall rules, which can bypass UFW, so I kept the port on the loopback address.
+- One container only. Next: Docker Compose and a CI pipeline.
