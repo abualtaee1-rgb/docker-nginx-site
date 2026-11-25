@@ -63,6 +63,7 @@ Every push to `main` triggers a GitHub Actions workflow (`.github/workflows/ci.y
 1. **Checkout the code** with `actions/checkout@v6`.
 2. **Build the Docker image** with `docker build -t my-web .`.
 3. **Test the container.** The workflow starts it with `docker run -d --name web -p 8080:80 my-web` and requests the page with `curl --fail`. If the server does not answer, the step fails and the run turns red.
+4. **Publish the image to GitHub Container Registry.** The workflow logs in to `ghcr.io` with the automatic `GITHUB_TOKEN` and pushes the image as `ghcr.io/abualtaee1-rgb/docker-nginx-site:latest`. The job only has `contents: read` and `packages: write` permissions (least privilege).
 
 ![Test step in GitHub Actions](docker-evidence/actions-test-step.png)
 
@@ -74,3 +75,4 @@ The log shows the page content returned by the container, which confirms that th
 - **Invalid workflow file (run #2).** GitHub reported a YAML syntax error on line 10. YAML is strict about indentation, so I rewrote the file with two spaces per level, and the next run passed.
 - **Exit code 127 in the test step.** I had misspelled `docker` in the workflow. Exit code 127 means "command not found", and the log line before the error showed which command failed.
 - **Node.js 20 deprecation warning.** The workflow warned that `actions/checkout@v4` runs on Node 20. I updated to `@v6`, which runs on Node 24, and the warning disappeared.
+- **`denied` when pushing to GHCR.** The first push uploaded the image layers but ended with `error from registry: denied`. After the package had been created and linked to the repository, I re-ran the workflow and it succeeded. I did not change the workflow file, so I can't say for certain what caused it.
