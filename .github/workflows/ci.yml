@@ -9,6 +9,6 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout the code
-            uses: actions/checkout@v4
+              uses: actions/checkout@v4
             - name: Build the docker image
-            run: docker build -t my-web .
+              run: docker build -t my-web .
