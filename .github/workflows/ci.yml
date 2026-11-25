@@ -5,8 +5,10 @@ on:
         branches: [main]
 
 jobs:
-    hello:
+    build:
         runs-on: ubuntu-latest
         steps:
-            - name: say hello
-              run: echo "Pipeline is running"        
+            - name: Checkout the code
+            uses: actions/checkout@v4
+            - name: Build the docker image
+            run: docker build -t my-web .
