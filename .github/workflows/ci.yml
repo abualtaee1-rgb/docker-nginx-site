@@ -21,4 +21,8 @@ jobs:
           sleep 3
           curl --fail http://localhost:8080
       - name: Log in to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin    
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Push the Docker image to GHCR
+        run: |
+           docker tag my-web ghcr.io/abualtaee1-rgb/docker-nginx-site:latest
+           docker push ghcr.io/abualtaee1-rgb/docker-nginx-site:latest    
