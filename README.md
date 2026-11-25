@@ -55,3 +55,22 @@ Files in [`docker-evidence`](docker-evidence):
 
 - I haven't tested how Docker's published ports interact with UFW. Docker writes its own firewall rules, which can bypass UFW, so I kept the port on the loopback address.
 - One container only. Next: Docker Compose and a CI pipeline.
+
+## CI/CD with GitHub Actions
+
+Every push to `main` triggers a GitHub Actions workflow (`.github/workflows/ci.yml`) that runs on an `ubuntu-latest` runner:
+
+1. **Checkout the code** with `actions/checkout@v6`.
+2. **Build the Docker image** with `docker build -t my-web .`.
+3. **Test the container.** The workflow starts it with `docker run -d --name web -p 8080:80 my-web` and requests the page with `curl --fail`. If the server does not answer, the step fails and the run turns red.
+
+![Test step in GitHub Actions](docker-evidence/actions-test-step.png)
+
+The log shows the page content returned by the container, which confirms that the image builds and serves the site on every push.
+
+### What broke
+
+- **Account locked due to a billing issue.** The first run failed with *"The job was not started because your account is locked due to a billing issue"*. I had removed my billing address after an earlier paid subscription. I fixed the billing details, re-ran the workflow and it passed.
+- **Invalid workflow file (run #2).** GitHub reported a YAML syntax error on line 10. YAML is strict about indentation, so I rewrote the file with two spaces per level, and the next run passed.
+- **Exit code 127 in the test step.** I had misspelled `docker` in the workflow. Exit code 127 means "command not found", and the log line before the error showed which command failed.
+- **Node.js 20 deprecation warning.** The workflow warned that `actions/checkout@v4` runs on Node 20. I updated to `@v6`, which runs on Node 24, and the warning disappeared.
