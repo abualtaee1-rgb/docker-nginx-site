@@ -31,6 +31,7 @@ sudo docker update --restart unless-stopped web
 - **`sudo docker`, not the `docker` group.** Membership in that group is effectively root access on the host, which doesn't fit a server I'm trying to harden.
 - **Port bound to `127.0.0.1`.** Docker publishes ports on all interfaces by default, and I only wanted local access.
 - **`unless-stopped`, not `always`.** If I stop the container on purpose, it stays stopped after a reboot.
+- `actions-test-step.png`: GitHub Actions log showing the container started in CI and `curl` returning the page
 
 ## Evidence
 
