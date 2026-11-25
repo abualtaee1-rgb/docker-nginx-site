@@ -41,6 +41,7 @@ Files in [`docker-evidence`](docker-evidence):
 - `docker-webpage-evidence.txt`: the page returned by `curl`
 - `docker-uptime-evidence.txt`: VM uptime after the reboot test
 - `docker-boot-evidence.txt`: Docker starting about 6.5 seconds after boot, and the container starting right after it
+- `actions-test-step.png`: GitHub Actions log showing the container started in CI and `curl` returning the page
 
 ## What broke and how I fixed it
 
