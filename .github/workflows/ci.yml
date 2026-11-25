@@ -20,3 +20,5 @@ jobs:
           docker run -d --name web -p 8080:80 my-web
           sleep 3
           curl --fail http://localhost:8080
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin    
