@@ -12,3 +12,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Build the Docker image
         run: docker build -t my-web .
+      - name: Test the container
+        run: |
+          doccker run -d --name web -p 8080:80 my-web
+          sleep 3
+          curl --fail http://localhost:8080
